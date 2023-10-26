@@ -14,6 +14,7 @@
 	
 	# Implicit: 
 		# - strings can be empty
+		# - do not modify original inputs; create new object
 
 # Examples:
 # =========

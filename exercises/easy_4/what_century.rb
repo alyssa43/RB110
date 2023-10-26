@@ -17,7 +17,6 @@
 	# Implicit: 
 		# - years: 1-100 are '1st'; 101-200 are '2nd'; 201-300 are '3rd'; ...
 
-
 # Examples:
 # =========
 # century(2000) == '20th'

@@ -1,11 +1,11 @@
 # PROBLEM:
 
-# 
+	# -  
 
-# input: 
-# outputs: 
+	# - input: 
+	# - outputs: 
 
-# Rules:
+	# Rules:
 		# Explicit requirements:
 		# - 
 

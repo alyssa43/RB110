@@ -23,13 +23,13 @@
   # - integer_to_string(5000) == '5000'
 
 # Data Structure(s): 
-  # - Hash
+  # - Array 
 
 # Algorithm: 
 
 	# `integer_to_string` method
 	# =============================
-		# - initialize a constant variable called `DIGITS` that references a hash converting each num to it's string representation
+		# - initialize a constant variable called `DIGITS` that references an Array with string numbers '0'-'9'
 		# - define a method called `integer_to_string`, that has one parameter called `integer`
 		# - convert `integer` to an Array, and iterate through said Array using `map`, that has one parameter called `num`
 			# - return the value of `num`s string representation
@@ -37,10 +37,7 @@
 
 # Code:
 
-DIGITS = {
-  0 => '0', 1 => '1', 2 => '2', 3 => '3', 4 => '4',
-  5 => '5', 6 => '6', 7 => '7', 8 => '8', 9 => '9'
-}
+DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 def integer_to_string(integer)
   integer.digits.reverse.map { |num| DIGITS[num] }.join

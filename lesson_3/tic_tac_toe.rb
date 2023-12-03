@@ -1,16 +1,4 @@
 require 'pry'
-# Tic Tac Toe
-
-# 1. Display the initial empty 3x3 board.
-# 2. Ask the user to mark a square.
-# 3. Computer marks a square.
-# 4. Display the updated board state.
-# 5. If winner, display winner.
-# 6. If board is full, display tie.
-# 7. If neither winner nor board is full, go to #2
-# 8. Play again?
-# 9. If yes, go to #1
-# 10. Goodbye!
 
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
@@ -24,10 +12,15 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+def display_scores(scores)
+	prompt "First player to score 5 points wins!"
+	prompt "Your Score: #{scores["Player"]} - Computer Score: #{scores["Computer"]}"
+end
+
 # rubocop:disable Metrics/AbcSize
-def display_board(brd)
+def display_board(brd, scores)
   system 'clear'
-  puts "You're an #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
+  display_scores(scores)
   puts ""
   puts "     |     |     "
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -58,7 +51,7 @@ def joinor(arr, punc = ', ', wrd = 'or')
   str = ''
   case arr.length
   when 1 then str += arr[0].to_s
-  when 2 then str += "#{arr[0]} #{wrd} #{arr[1]}"
+  when 2 then str += arr.join(" #{wrd} ")
   else arr.each_with_index do |num, i|
     str += (arr.length == i + 1 ? "#{wrd} #{num}" : "#{num}#{punc}")
   end
@@ -69,8 +62,7 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-		prompt "Choose a position to place a piece: #{joinor(empty_squares(brd))} "
-    #prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
+    prompt "Choose a position to place a piece: #{joinor(empty_squares(brd))} "
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt "Sorry, that is not a valid choice."
@@ -91,6 +83,10 @@ def someone_won?(brd)
   !!detect_winner(brd)
 end
 
+def update_score(score, winner)
+	score[winner] += 1
+end
+
 def detect_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
@@ -102,30 +98,58 @@ def detect_winner(brd)
   nil
 end
 
-loop do # main loop
-  board = initialize_board
+def display_winner(winner, board, scores)
+	display_board(board, scores)
+  if winner == "Player"
+	  prompt "Congratulations, you won!"
+	else
+		prompt "Computer wins"
+	end
+end
 
-  loop do
-    display_board(board)
+loop do # Loop One
+  scores = {"Player" => 0, "Computer" => 0}
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+  loop do # Loop Two
+    board = initialize_board
 
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-  end
+    loop do # Loop Three
+      display_board(board, scores)
 
-  display_board(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
 
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
-  end
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end # Loop Three
+
+		loop do # Loop Four
+      if someone_won?(board)
+        winner = detect_winner(board)
+		    update_score(scores, winner)
+				display_winner(winner, board, scores)
+      else
+				display_board(board, scores)
+        prompt "It's a tie!"
+			end
+      break
+		end # Loop Four
+
+  if scores.value?(5)
+		grand_winner = scores.key(5)
+		display_winner(grand_winner, board, scores)
+		prompt " - GAME OVER -"
+		break
+	else 
+		prompt "Ready for next game? (y or n)" 
+	  next_game = gets.chomp
+    break unless next_game.downcase.start_with?('y')
+	end
+  end # Loop Two
 
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
-end
+end # Loop One
 
 prompt "Thanks for playing Tic Tac Toe! Goodbye!"

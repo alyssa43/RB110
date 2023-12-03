@@ -12,10 +12,12 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
+# rubocop:disable Layout/LineLength
 def display_scores(scores)
-	prompt "First player to score 5 points wins!"
-	prompt "Your Score: #{scores["Player"]} - Computer Score: #{scores["Computer"]}"
+  prompt "First player to score 5 points wins!"
+  prompt "Your Score: #{scores['Player']} - Computer Score: #{scores['Computer']}"
 end
+# rubocop:enable Layout/LineLength
 
 # rubocop:disable Metrics/AbcSize
 def display_board(brd, scores)
@@ -84,7 +86,7 @@ def someone_won?(brd)
 end
 
 def update_score(score, winner)
-	score[winner] += 1
+  score[winner] += 1
 end
 
 def detect_winner(brd)
@@ -99,16 +101,16 @@ def detect_winner(brd)
 end
 
 def display_winner(winner, board, scores)
-	display_board(board, scores)
-  if winner == "Player"
-	  prompt "Congratulations, you won!"
-	else
-		prompt "Computer wins"
-	end
+  display_board(board, scores)
+  if winner == 'Player'
+    prompt "Congratulations, you won!"
+  else
+    prompt "Computer wins"
+  end
 end
 
 loop do # Loop One
-  scores = {"Player" => 0, "Computer" => 0}
+  scores = { "Player" => 0, "Computer" => 0 }
 
   loop do # Loop Two
     board = initialize_board
@@ -123,28 +125,25 @@ loop do # Loop One
       break if someone_won?(board) || board_full?(board)
     end # Loop Three
 
-		loop do # Loop Four
-      if someone_won?(board)
-        winner = detect_winner(board)
-		    update_score(scores, winner)
-				display_winner(winner, board, scores)
-      else
-				display_board(board, scores)
-        prompt "It's a tie!"
-			end
-      break
-		end # Loop Four
+    if someone_won?(board)
+      winner = detect_winner(board)
+      update_score(scores, winner)
+      display_winner(winner, board, scores)
+    else
+      display_board(board, scores)
+      prompt "It's a tie!"
+    end
 
-  if scores.value?(5)
-		grand_winner = scores.key(5)
-		display_winner(grand_winner, board, scores)
-		prompt " - GAME OVER -"
-		break
-	else 
-		prompt "Ready for next game? (y or n)" 
-	  next_game = gets.chomp
-    break unless next_game.downcase.start_with?('y')
-	end
+    if scores.value?(5)
+      grand_winner = scores.key(5)
+      display_winner(grand_winner, board, scores)
+      prompt " - GAME OVER -"
+      break
+    else
+      prompt "Ready for next game? (y or n)"
+      next_game = gets.chomp
+      break unless next_game.downcase.start_with?('y')
+    end
   end # Loop Two
 
   prompt "Play again? (y or n)"

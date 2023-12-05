@@ -14,6 +14,7 @@ end
 
 # rubocop:disable Layout/LineLength
 def display_scores(scores)
+	prompt "You're an #{PLAYER_MARKER}. Computer is an #{COMPUTER_MARKER}."
   prompt "First player to score 5 points wins!"
   prompt "Your Score: #{scores['Player']} - Computer Score: #{scores['Computer']}"
 end
@@ -45,8 +46,38 @@ def initialize_board
   new_board
 end
 
+def first_turn(game_count)
+	answer = ''
+	if game_count.even?
+		loop do
+			prompt "You can choose who goes first!"
+			prompt "Choose 'P' for Player (you) -or- 'C' for Computer (me)"
+			answer = gets.chomp.downcase
+			break if answer == 'p' || answer == 'c'
+			prompt "Invalid choice, please try again"
+		end
+	else
+		answer = 'c'
+	end
+	answer
+end
+
 def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
+end
+
+def empty_defense_squares(brd)
+	lines_to_defend = WINNING_LINES.select do |line|
+		brd.values_at(*line).count(PLAYER_MARKER) == 2
+	end
+	lines_to_defend.flatten.select { |square| brd[square] == INITIAL_MARKER }
+end
+
+def empty_offense_squares(brd)
+	offense_lines = WINNING_LINES.select do |line|
+		brd.values_at(*line).count(COMPUTER_MARKER) == 2
+	end
+	offense_lines.flatten.select { |square| brd[square] == INITIAL_MARKER }
 end
 
 def joinor(arr, punc = ', ', wrd = 'or')
@@ -61,6 +92,7 @@ def joinor(arr, punc = ', ', wrd = 'or')
   str
 end
 
+
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -72,9 +104,38 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def detect_threat?(brd)
+	threat = false
+  WINNING_LINES.each do |line|
+		if brd.values_at(*line).count(PLAYER_MARKER) == 2
+			threat = true
+		end
+	end
+	threat
+end
+
+def detect_offensive_move?(brd)
+	offensive_move = false
+	WINNING_LINES.each do |line|
+		if brd.values_at(*line).count(COMPUTER_MARKER) == 2
+			offensive_move = true
+		end
+	end
+	offensive_move
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
+	square = ''
+	if detect_offensive_move?(brd) && !empty_offense_squares(brd).empty?
+		square = empty_offense_squares(brd).sample
+	elsif detect_threat?(brd) && !empty_defense_squares(brd).empty?
+		square = empty_defense_squares(brd).sample
+	elsif brd[5] == INITIAL_MARKER
+		square = 5
+	else
+	 square = empty_squares(brd).sample
+	end
+	brd[square] = COMPUTER_MARKER
 end
 
 def board_full?(brd)
@@ -111,19 +172,32 @@ end
 
 loop do # Loop One
   scores = { "Player" => 0, "Computer" => 0 }
+	game_count = 0
 
   loop do # Loop Two
+		system 'clear'
     board = initialize_board
+		player_one = first_turn(game_count)
 
-    loop do # Loop Three
-      display_board(board, scores)
+    if player_one == 'p'
+			loop do 
+				display_board(board, scores)
+        player_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
 
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
+        computer_places_piece!(board)
+        break if someone_won?(board) || board_full?(board)
+			end
+		else
+			loop do
+			  computer_places_piece!(board)
+				break if someone_won?(board) || board_full?(board)
+				display_board(board, scores)
 
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    end # Loop Three
+			  player_places_piece!(board)
+			  break if someone_won?(board) || board_full?(board)
+			end
+		end
 
     if someone_won?(board)
       winner = detect_winner(board)
@@ -133,6 +207,8 @@ loop do # Loop One
       display_board(board, scores)
       prompt "It's a tie!"
     end
+
+		game_count += 1
 
     if scores.value?(5)
       grand_winner = scores.key(5)

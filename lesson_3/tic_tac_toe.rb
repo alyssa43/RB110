@@ -15,15 +15,16 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-# rubocop:disable Metrics/MethodLength
-def display_welcome_message(brd)
+def display_welcome_message
   system 'clear'
   puts "---> Welcome to Tic Tac Toe <--- \n \n"
   puts <<~WELCOME
     In this game of Tic Tac Toe you will play against the computer, taking turns
     putting your marks in empty squares. The squares are numbered as followed:
     WELCOME
-  display_board(brd)
+end
+
+def display_rules
   puts <<~RULES
     The first player to get 3 of their marks in a row (up, down, across, or
     diagonally) is the winner of that round and recieves 1 point. We will
@@ -39,7 +40,6 @@ def display_welcome_message(brd)
   gets.chomp
   system 'clear'
 end
-# rubocop:enable Metrics/MethodLength
 
 def display_scores(scores)
   system 'clear'
@@ -193,11 +193,11 @@ def display_winner(winner, board, scores)
   end
 end
 
-##################
-# Main Game Loop #
-##################
+# Main Game Loop
 
-display_welcome_message(LABELED_BOARD)
+display_welcome_message
+display_board(LABELED_BOARD)
+display_rules
 
 loop do # Loop One
   scores = { "Player" => 0, "Computer" => 0 }

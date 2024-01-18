@@ -20,15 +20,16 @@
 # triangle(0, 3, 3) == :invalid
 # triangle(3, 1, 1) == :invalid
 
-def valid_triangle?(dimensions)
-  dimensions.none?(0) && dimensions[0] + dimensions[1] > dimensions[2]
+def valid_triangle?(sides)
+  sides.all? { |length| length > 0 } && sides[0] + sides[1] > sides[2]
 end
 
 def triangle(side1, side2, side3)
-  case
-  when !valid_triangle?([side1, side2, side3].sort) then :invalid
-  when side1 == side2 && side2 == side3 then :equilateral
-  when side1 == side2 || side2 == side3 || side1 == side3 then :isosceles
+  dimensions = [side1, side2, side3].sort
+  return :invalid unless valid_triangle?(dimensions)
+  case dimensions.uniq.size
+  when 1 then :equilateral
+  when 2 then :isosceles
   else :scalene
   end
 end
